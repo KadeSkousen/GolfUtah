@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 
 app.use('/api', apiRoutes);
 app.use('/api', alertRoutes);
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(process.cwd(), 'public')));
 app.get('/', (req, res) => {
   const indexPath = path.join(__dirname, '../public/index.html');
   fs.existsSync(indexPath) ? res.sendFile(indexPath) : res.json({ name: 'Golf Utah API', status: 'running' });
