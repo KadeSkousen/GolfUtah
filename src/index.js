@@ -40,3 +40,4 @@ app.use((err, req, res, next) => { console.error(err); res.status(500).json({ er
 
 app.listen(PORT, () => console.log(`\n⛳  Golf Utah running on port ${PORT}`));
 module.exports = app;
+
