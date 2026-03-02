@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golf Utah — Find Your Tee Time</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-deep: #1a3a2a;
+    --green-mid: #2d5a3d;
+    --green-bright: #4a8c5c;
+    --green-light: #7bbf8a;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --stone: #f4f0e8;
+    --stone-dark: #e6dfd0;
+    --white: #fdfcf9;
+    --text-dark: #1a2418;
+    --text-mid: #4a5a45;
+    --text-light: #8a9a85;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--stone);
+    color: var(--text-dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--green-deep);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--gold); }
+  .nav-links { display: flex; gap: 2rem; align-items: center; }
+  .nav-links a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--white); }
+  .nav-btn {
+    background: var(--gold);
+    color: var(--green-deep) !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    transition: background 0.2s !important;
+  }
+  .nav-btn:hover { background: var(--gold-light) !important; }
+
+  /* ── SCREENS ── */
+  .screen { display: none; animation: fadeIn 0.3s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(160deg, var(--green-deep) 0%, var(--green-mid) 55%, var(--green-bright) 100%);
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(201,168,76,0.2);
+    color: var(--gold-light);
+    border: 1px solid rgba(201,168,76,0.4);
+    padding: 0.3rem 1rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.05;
+    margin-bottom: 1rem;
+  }
+  .hero h1 em { color: var(--gold); font-style: normal; }
+  .hero p {
+    color: rgba(255,255,255,0.7);
+    font-size: 1.1rem;
+    max-width: 520px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.6;
+  }
+
+  /* ── SEARCH CARD ── */
+  .search-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 820px;
+    margin: 0 auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    position: relative;
+  }
+  .search-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 1rem;
+    align-items: end;
+  }
+  .field-group label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+  }
+  .field-group input, .field-group select {
+    width: 100%;
+    border: 2px solid var(--stone-dark);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    background: var(--white);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .field-group input:focus, .field-group select:focus {
+    border-color: var(--green-bright);
+  }
+  .search-btn {
+    background: var(--green-deep);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .search-btn:hover { background: var(--green-mid); transform: translateY(-1px); }
+  .search-btn:active { transform: translateY(0); }
+
+  /* ── MAIN CONTENT ── */
+  .main-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+  }
+
+  /* ── COURSE SELECTOR ── */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-dark);
+  }
+  .section-sub {
+    color: var(--text-light);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  .select-count {
+    background: var(--green-deep);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* ── COURSE SEARCH BAR ── */
+  .course-search-wrap {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  .course-search-wrap input {
+    width: 100%;
+    border: 2px solid var(--stone-dark);
+    border-radius: 10px;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .course-search-wrap input:focus { border-color: var(--green-bright); }
+  .course-search-wrap .search-icon {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    pointer-events: none;
+    opacity: 0.45;
+  }
+  .course-search-wrap .clear-btn {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--stone-dark);
+    border: none;
+    border-radius: 50%;
+    width: 20px; height: 20px;
+    font-size: 0.65rem;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-mid);
+  }
+  .course-search-wrap.has-value .clear-btn { display: flex; }
+  .no-results-msg {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.875rem;
+    padding: 1.5rem;
+    display: none;
+  }
+
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+    max-height: 340px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .courses-grid::-webkit-scrollbar { width: 4px; }
+  .courses-grid::-webkit-scrollbar-track { background: transparent; }
+  .courses-grid::-webkit-scrollbar-thumb { background: var(--stone-dark); border-radius: 4px; }
+
+  /* ── TIME-WINDOW RESULTS ── */
+  .time-window-block {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1px solid var(--stone-dark);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+  }
+  .time-window-header {
+    background: var(--green-deep);
+    color: white;
+    padding: 0.9rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .time-window-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  .time-window-count {
+    font-size: 0.78rem;
+    opacity: 0.7;
+    background: rgba(255,255,255,0.12);
+    padding: 0.2rem 0.75rem;
+    border-radius: 100px;
+  }
+  .time-window-course-row {
+    border-bottom: 1px solid var(--stone-dark);
+    padding: 0.85rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .time-window-course-row:last-child { border-bottom: none; }
+  .tw-course-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    min-width: 160px;
+    flex-shrink: 0;
+  }
+  .tw-course-city {
+    font-size: 0.72rem;
+    color: var(--text-light);
+    margin-top: 1px;
+  }
+  .tw-times-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    flex: 1;
+  }
+  .tw-time-pill {
+    border: 1.5px solid var(--stone-dark);
+    border-radius: 7px;
+    padding: 0.35rem 0.7rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--white);
+  }
+  .tw-time-pill:hover { border-color: var(--gold); background: rgba(201,168,76,0.07); }
+  .tw-time-pill.hot { border-color: var(--gold); background: rgba(201,168,76,0.06); }
+  .tw-pill-time { font-size: 0.82rem; font-weight: 700; color: var(--text-dark); }
+  .tw-pill-price { font-size: 0.65rem; color: var(--text-light); }
+  .tw-pill-book { font-size: 0.6rem; color: var(--gold); font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 1px; }
+  .course-chip {
+    border: 2px solid var(--stone-dark);
+    border-radius: 10px;
+    padding: 0.875rem 1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .course-chip:hover { border-color: var(--green-bright); background: rgba(74,140,92,0.05); }
+  .course-chip.selected {
+    border-color: var(--green-mid);
+    background: rgba(45,90,61,0.08);
+  }
+  .chip-check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--stone-dark);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    font-size: 0.65rem;
+    color: transparent;
+  }
+  .course-chip.selected .chip-check {
+    background: var(--green-mid);
+    border-color: var(--green-mid);
+    color: white;
+  }
+  .chip-info { flex: 1; min-width: 0; }
+  .chip-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .chip-city {
+    font-size: 0.72rem;
+    color: var(--text-light);
+    margin-top: 1px;
+  }
+
+  /* ── RESULTS ── */
+  .results-header {
+    background: var(--green-deep);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .results-title { font-weight: 600; font-size: 0.95rem; }
+  .results-meta { font-size: 0.8rem; opacity: 0.7; }
+
+  .course-result-block {
+    background: var(--white);
+    border: 1px solid var(--stone-dark);
+    margin-bottom: 1px;
+  }
+  .course-result-block:last-child { border-radius: 0 0 12px 12px; }
+
+  .course-result-header {
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--stone-dark);
+    background: rgba(244,240,232,0.5);
+    cursor: pointer;
+  }
+  .course-result-name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text-dark);
+  }
+  .course-result-city { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; }
+  .course-result-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--green-mid);
+    background: rgba(45,90,61,0.1);
+    padding: 0.2rem 0.7rem;
+    border-radius: 100px;
+  }
+
+  .tee-times-row {
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .tee-time-btn {
+    border: 2px solid var(--stone-dark);
+    background: var(--white);
+    border-radius: 8px;
+    padding: 0.5rem 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    text-decoration: none;
+  }
+  .tee-time-btn:hover {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.07);
+  }
+  .tee-time-btn.hot { border-color: var(--gold); }
+  .tt-time { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); }
+  .tt-price { font-size: 0.72rem; color: var(--text-light); }
+  .tt-players { font-size: 0.65rem; color: var(--green-mid); font-weight: 600; }
+  .tt-link-label {
+    font-size: 0.62rem;
+    color: var(--gold);
+    font-weight: 600;
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── ALERT SCREEN ── */
+  .alert-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2.5rem;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+  }
+  .alert-icon {
+    width: 56px; height: 56px;
+    background: rgba(201,168,76,0.15);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 1.25rem;
+  }
+  .alert-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .alert-card p { color: var(--text-mid); line-height: 1.6; margin-bottom: 1.5rem; }
+
+  .form-row { margin-bottom: 1.25rem; }
+  .form-row label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+  }
+  .form-row input, .form-row select {
+    width: 100%;
+    border: 2px solid var(--stone-dark);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-row input:focus, .form-row select:focus { border-color: var(--green-bright); }
+  .form-row-two { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .submit-btn {
+    width: 100%;
+    background: var(--green-deep);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 0.5rem;
+  }
+  .submit-btn:hover { background: var(--green-mid); }
+
+  .alert-example {
+    background: var(--green-deep);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .alert-example-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .alert-example-text { color: rgba(255,255,255,0.9); font-size: 0.85rem; line-height: 1.5; }
+  .alert-example-text strong { color: var(--gold-light); }
+
+  /* ── MY ALERTS LIST ── */
+  .alerts-list { max-width: 700px; margin: 0 auto; }
+  .alert-item {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--stone-dark);
+  }
+  .alert-item-left { flex: 1; }
+  .alert-item-courses { font-weight: 600; color: var(--text-dark); font-size: 0.95rem; }
+  .alert-item-details { color: var(--text-light); font-size: 0.8rem; margin-top: 3px; }
+  .alert-toggle {
+    width: 44px; height: 24px;
+    background: var(--green-mid);
+    border-radius: 100px;
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: 1rem;
+  }
+  .alert-toggle::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    background: white;
+    border-radius: 50%;
+    top: 3px; right: 3px;
+    transition: right 0.2s;
+  }
+  .alert-toggle.off { background: var(--stone-dark); }
+  .alert-toggle.off::after { right: auto; left: 3px; }
+
+  /* ── FOOTER TABS ── */
+  .bottom-tabs {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--green-deep);
+    padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom));
+    display: flex;
+    justify-content: space-around;
+    z-index: 100;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .tab-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 0.4rem 0.25rem;
+    cursor: pointer;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.15s;
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .tab-btn.active { color: var(--gold-light); }
+  .tab-icon { font-size: 1.35rem; }
+
+  .tag-pill {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .tag-green { background: rgba(74,140,92,0.12); color: var(--green-mid); }
+  .tag-gold { background: rgba(201,168,76,0.12); color: #9a7020; }
+
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--green-deep);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 100px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    z-index: 200;
+    white-space: nowrap;
+    border: 1px solid rgba(201,168,76,0.4);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 640px) {
+    .search-grid { grid-template-columns: 1fr 1fr; }
+    .search-grid .search-btn { grid-column: 1 / -1; }
+    .hero { padding: 3rem 1.25rem 2.5rem; }
+    .main-content { padding: 2rem 1.25rem 6rem; }
+    .bottom-tabs { display: flex; }
+    .nav-links { display: none; }
+    .form-row-two { grid-template-columns: 1fr; }
+  }
+
+  /* Loading dots */
+  .loading { display: none; text-align: center; padding: 3rem; color: var(--text-light); }
+  .loading.show { display: block; }
+  .dots span {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--green-bright);
+    border-radius: 50%;
+    margin: 0 3px;
+    animation: bounce 1.2s ease infinite;
+  }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:scale(0.8);opacity:0.5} 40%{transform:scale(1.2);opacity:1} }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-light);
+  }
+  .empty-state .e-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .empty-state h3 { font-family: 'Playfair Display', serif; color: var(--text-mid); margin-bottom: 0.5rem; }
+
+  .stat-bar {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .stat-box {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    flex: 1;
+    border: 1px solid var(--stone-dark);
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--green-mid);
+  }
+  .stat-label { font-size: 0.75rem; color: var(--text-light); font-weight: 500; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Golf<span>Utah</span></div>
+  <div class="nav-links">
+    <a href="#" class="active" onclick="showScreen('search')">Find Tee Times</a>
+    <a href="#" onclick="showScreen('courses')">Courses</a>
+    <a href="#" onclick="showScreen('alerts')">My Alerts</a>
+    <a href="#" class="nav-btn" onclick="showScreen('alerts-new')">🔔 Set Alert</a>
+  </div>
+</nav>
+
+<!-- ═══════════════ SEARCH SCREEN ═══════════════ -->
+<div id="screen-search" class="screen active">
+  <div class="hero">
+    <div class="hero-tag">🌄 Utah's #1 Tee Time Finder</div>
+    <h1>Find Your Perfect<br><em>Tee Time</em></h1>
+    <p>Search across Utah's top golf courses in one place — and get instant alerts when your favorite time opens up.</p>
+
+    <div class="search-card">
+      <div class="search-grid">
+        <div class="field-group">
+          <label>Date</label>
+          <input type="date" id="search-date">
+        </div>
+        <div class="field-group">
+          <label>Tee Time</label>
+          <select id="search-time">
+            <option value="">Any Time</option>
+            <option>Early Bird (5–8am)</option>
+            <option>Morning (8–11am)</option>
+            <option>Midday (11am–2pm)</option>
+            <option>Afternoon (2–6pm)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Players</label>
+          <select id="search-players">
+            <option>1 Player</option>
+            <option selected>2 Players</option>
+            <option>3 Players</option>
+            <option>4 Players</option>
+          </select>
+        </div>
+        <button class="search-btn" onclick="runSearch()">Search →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <!-- Course selector -->
+    <div class="section-header">
+      <div>
+        <div class="section-title">Select Courses</div>
+        <div class="section-sub">Choose up to 15 courses to search</div>
+      </div>
+      <span class="select-count" id="sel-count">5 selected</span>
+    </div>
+    <div class="course-search-wrap" id="course-search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="course-filter" placeholder="Search courses by name or city…" oninput="filterCourses(this)" autocomplete="off">
+      <button class="clear-btn" onclick="clearCourseFilter()">✕</button>
+    </div>
+    <div class="no-results-msg" id="no-results-msg">No courses match your search.</div>
+    <div class="courses-grid" id="courses-grid"></div>
+
+    <!-- Results -->
+    <div id="results-area">
+      <div class="empty-state">
+        <div class="e-icon">⛳</div>
+        <h3>Ready to search</h3>
+        <p>Select your courses above, pick a date, and hit Search to see available tee times.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ COURSES SCREEN ═══════════════ -->
+<div id="screen-courses" class="screen">
+  <div style="background: var(--green-deep); padding: 3rem 2rem 2rem; text-align:center;">
+    <h1 style="font-family:'Playfair Display',serif;color:white;font-size:2rem;font-weight:900;">Utah Golf Courses</h1>
+    <p style="color:rgba(255,255,255,0.65);margin-top:0.5rem;">All 50+ courses in our database</p>
+  </div>
+  <div class="main-content">
+    <div class="stat-bar">
+      <div class="stat-box"><div class="stat-num">50+</div><div class="stat-label">Courses Tracked</div></div>
+      <div class="stat-box"><div class="stat-num">12</div><div class="stat-label">Cities Covered</div></div>
+      <div class="stat-box"><div class="stat-num">Live</div><div class="stat-label">Availability Data</div></div>
+    </div>
+    <div class="courses-grid" id="courses-grid-2"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ ALERTS SCREEN ═══════════════ -->
+<div id="screen-alerts" class="screen">
+  <div style="background: var(--green-deep); padding: 3rem 2rem 2rem; text-align:center;">
+    <h1 style="font-family:'Playfair Display',serif;color:white;font-size:2rem;font-weight:900;">My Tee Time Alerts</h1>
+    <p style="color:rgba(255,255,255,0.65);margin-top:0.5rem;">We'll text you the moment a spot opens up</p>
+  </div>
+  <div class="main-content">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:1.5rem;">
+      <button class="search-btn" onclick="showScreen('alerts-new')">+ New Alert</button>
+    </div>
+    <div class="alerts-list">
+      <div class="alert-item">
+        <div class="alert-item-left">
+          <div class="alert-item-courses">Thanksgiving Point · Sleepy Ridge</div>
+          <div class="alert-item-details">⏰ 7:00–9:00am · 2 players · Any day this week · <span class="tag-pill tag-green">Active</span></div>
+        </div>
+        <div class="alert-toggle" onclick="this.classList.toggle('off')"></div>
+      </div>
+      <div class="alert-item">
+        <div class="alert-item-left">
+          <div class="alert-item-courses">Soldiers Hollow · Hobble Creek</div>
+          <div class="alert-item-details">⏰ 6:00–7:30am · 4 players · Sat & Sun · <span class="tag-pill tag-gold">Paused</span></div>
+        </div>
+        <div class="alert-toggle off" onclick="this.classList.toggle('off')"></div>
+      </div>
+      <div class="alert-item">
+        <div class="alert-item-left">
+          <div class="alert-item-courses">Entrada at Snow Canyon</div>
+          <div class="alert-item-details">⏰ Any time · 2 players · Mar 15–20 · <span class="tag-pill tag-green">Active</span></div>
+        </div>
+        <div class="alert-toggle" onclick="this.classList.toggle('off')"></div>
+      </div>
+    </div>
+
+    <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:12px;padding:1.25rem 1.5rem;margin-top:1rem;display:flex;gap:1rem;align-items:center;">
+      <span style="font-size:1.5rem;">📱</span>
+      <div>
+        <div style="font-weight:600;font-size:0.9rem;color:var(--text-dark);">Last alert sent 2 hours ago</div>
+        <div style="font-size:0.8rem;color:var(--text-light);margin-top:2px;">"Tee time available at Thanksgiving Point — Sat 7:12am for 2 players. Book now →"</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ NEW ALERT SCREEN ═══════════════ -->
+<div id="screen-alerts-new" class="screen">
+  <div class="main-content">
+    <div style="max-width:600px;margin:0 auto;">
+      <button onclick="showScreen('alerts')" style="background:none;border:none;color:var(--text-light);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.875rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.4rem;">← Back to Alerts</button>
+    </div>
+    <div class="alert-card">
+      <div class="alert-icon">🔔</div>
+      <h2>Create Tee Time Alert</h2>
+      <p>We'll monitor your selected courses and send you a text the moment your ideal tee time becomes available — even from cancellations.</p>
+
+      <div class="form-row">
+        <label>Your Phone Number</label>
+        <input type="tel" placeholder="(801) 555-0123">
+      </div>
+      <div class="form-row">
+        <label>Watch These Courses (select multiple)</label>
+        <select multiple style="height:140px;" id="alert-courses">
+      </div>
+      <div class="form-row-two form-row">
+        <div>
+          <label>Date Range Start</label>
+          <input type="date">
+        </div>
+        <div>
+          <label>Date Range End</label>
+          <input type="date">
+        </div>
+      </div>
+      <div class="form-row-two form-row">
+        <div>
+          <label>Earliest Tee Time</label>
+          <select>
+            <option>Any</option>
+            <option>5:00 AM</option>
+            <option>6:00 AM</option>
+            <option>7:00 AM</option>
+            <option>8:00 AM</option>
+            <option>9:00 AM</option>
+            <option>10:00 AM</option>
+          </select>
+        </div>
+        <div>
+          <label>Latest Tee Time</label>
+          <select>
+            <option>Any</option>
+            <option>9:00 AM</option>
+            <option>10:00 AM</option>
+            <option>11:00 AM</option>
+            <option>12:00 PM</option>
+            <option>2:00 PM</option>
+            <option>4:00 PM</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-two form-row">
+        <div>
+          <label>Number of Players</label>
+          <select>
+            <option>1</option>
+            <option selected>2</option>
+            <option>3</option>
+            <option>4</option>
+          </select>
+        </div>
+        <div>
+          <label>Days of Week</label>
+          <select>
+            <option>Any Day</option>
+            <option>Weekdays Only</option>
+            <option>Weekends Only</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="alertCreated()">🔔 Activate Alert</button>
+
+      <div class="alert-example">
+        <div class="alert-example-icon">💬</div>
+        <div class="alert-example-text">
+          <strong>Example text you'll receive:</strong><br>
+          "⛳ GolfUtah Alert: Tee time just opened at Thanksgiving Point — Sat Mar 15, 7:24am for 2 players. Tap to book: [link]"
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom tabs (mobile) -->
+<div class="bottom-tabs">
+  <button class="tab-btn active" onclick="showScreen('search');setTab(this)">
+    <span class="tab-icon">🔍</span>Search
+  </button>
+  <button class="tab-btn" onclick="showScreen('courses');setTab(this)">
+    <span class="tab-icon">🗺️</span>Courses
+  </button>
+  <button class="tab-btn" onclick="showScreen('alerts');setTab(this)">
+    <span class="tab-icon">🔔</span>Alerts
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+const COURSES = [
+  // Salt Lake City area (public/municipal)
+  { name: "Bonneville Golf Course", city: "Salt Lake City", selected: false },
+  { name: "Forest Dale Golf Course", city: "Salt Lake City", selected: false },
+  { name: "Glendale Golf Course", city: "Salt Lake City", selected: false },
+  { name: "Mick Riley Golf Course", city: "Murray", selected: false },
+  { name: "Mountain Dell Golf Course", city: "Salt Lake City", selected: false },
+  { name: "Murray Parkway Golf Course", city: "Murray", selected: false },
+  { name: "Nibley Park Golf Course", city: "Salt Lake City", selected: false },
+  { name: "Old Mill Golf Club", city: "Salt Lake City", selected: false },
+  { name: "Oquirrh Hills Golf Course", city: "Riverton", selected: false },
+  { name: "Rose Park Golf Course", city: "Salt Lake City", selected: false },
+  { name: "University of Utah Golf Course", city: "Salt Lake City", selected: false },
+  { name: "Wingpointe Golf Course", city: "Salt Lake City", selected: false },
+  // South SL Valley (public)
+  { name: "Jordan River Par Three", city: "South Jordan", selected: false },
+  { name: "Meadow Brook Golf Course", city: "Taylorsville", selected: false },
+  { name: "South Mountain Golf Club", city: "Draper", selected: false },
+  { name: "Stonebridge Golf Club", city: "West Valley City", selected: false },
+  { name: "River Oaks Golf Course", city: "South Jordan", selected: false },
+  { name: "Riverbend Golf Course", city: "Sandy", selected: false },
+  // Utah Valley (public)
+  { name: "East Bay Golf Course", city: "Provo", selected: false },
+  { name: "Fox Hollow Golf Club", city: "American Fork", selected: false },
+  { name: "Gladstan Golf Course", city: "Payson", selected: false },
+  { name: "Hobble Creek Golf Course", city: "Springville", selected: false },
+  { name: "Spanish Oaks Golf Course", city: "Spanish Fork", selected: false },
+  { name: "TalonsCove Golf Course", city: "Saratoga Springs", selected: false },
+  { name: "Thanksgiving Point Golf Course", city: "Lehi", selected: true },
+  { name: "The Links at Sleepy Ridge", city: "Orem", selected: true },
+  { name: "The Ranches Golf Club", city: "Eagle Mountain", selected: false },
+  { name: "The Links at Overlake", city: "Lindon", selected: false },
+  { name: "Sunset View Golf Course", city: "Orem", selected: false },
+  { name: "The Ridge Golf Course", city: "West Valley City", selected: false },
+  // Heber / Midway (public)
+  { name: "Homestead Golf Club", city: "Midway", selected: false },
+  { name: "Soldier Hollow Golf Course", city: "Midway", selected: true },
+  { name: "Wasatch Mountain Golf Course", city: "Midway", selected: false },
+  // Davis / Weber Counties (public)
+  { name: "Bountiful Ridge Golf Course", city: "Bountiful", selected: false },
+  { name: "Davis Park Golf Course", city: "Fruit Heights", selected: false },
+  { name: "Eaglewood Golf Course", city: "North Salt Lake", selected: false },
+  { name: "Fore Lakes Golf Course", city: "West Valley City", selected: false },
+  { name: "Glen Eagle Golf Club", city: "Syracuse", selected: false },
+  { name: "Lakeside Golf Course", city: "West Point", selected: false },
+  { name: "Schneiters Pebblebrook Links", city: "West Bountiful", selected: false },
+  { name: "Schneiters Riverside Golf Course", city: "West Bountiful", selected: false },
+  { name: "Stansbury Park Golf Course", city: "Stansbury Park", selected: false },
+  { name: "Valley View Golf Course", city: "Layton", selected: false },
+  { name: "Glenmoore Golf Course", city: "Highland", selected: false },
+  // Ogden area (public/municipal)
+  { name: "Ben Lomond Golf Course", city: "Ogden", selected: false },
+  { name: "El Monte Golf Course", city: "Ogden", selected: false },
+  { name: "Mount Ogden Golf Course", city: "Ogden", selected: false },
+  { name: "Mulligans North", city: "Ogden", selected: false },
+  { name: "Mulligans South", city: "Ogden", selected: false },
+  { name: "Eagle Mountain Golf Course", city: "Brigham City", selected: false },
+  // Cache Valley / Northern Utah (public)
+  { name: "Birch Creek Golf Club", city: "Smithfield", selected: false },
+  { name: "Logan River Golf Course", city: "Logan", selected: false },
+  { name: "Bear Lake Golf Course", city: "Garden City", selected: false },
+  { name: "Sherwood Hills Golf Course", city: "Wellsville", selected: false },
+  // Park City area (public)
+  { name: "Canyons Golf", city: "Park City", selected: false },
+  { name: "Jeremy Golf Ranch & Country Club", city: "Park City", selected: false },
+  { name: "Park City Golf Course", city: "Park City", selected: false },
+  { name: "Park Meadows Golf Club", city: "Park City", selected: false },
+  { name: "Round Valley Golf Course", city: "Park City", selected: false },
+  // St. George / Southern Utah (public)
+  { name: "Black Desert Resort Golf Course", city: "Ivins", selected: false },
+  { name: "Canyon Breeze Golf Course", city: "Hurricane", selected: false },
+  { name: "Coral Canyon Golf Course", city: "Washington", selected: false },
+  { name: "Coral Cliffs Golf Course", city: "Kanab", selected: false },
+  { name: "Dixie Red Hills Golf Course", city: "St. George", selected: false },
+  { name: "Entrada at Snow Canyon CC", city: "St. George", selected: false },
+  { name: "Green Spring Golf Course", city: "Washington", selected: false },
+  { name: "Sand Hollow Golf Course", city: "Washington", selected: false },
+  { name: "Sky Mountain Golf Course", city: "Hurricane", selected: false },
+  { name: "Southgate Golf Club", city: "St. George", selected: false },
+  { name: "St George Golf Club", city: "St. George", selected: false },
+  { name: "SunRiver Golf Course", city: "St. George", selected: false },
+  { name: "Sunbrook Golf Club", city: "St. George", selected: false },
+  { name: "The Ledges of St. George", city: "St. George", selected: false },
+  // Rural Utah (public)
+  { name: "Cedar Hills Golf Club", city: "Cedar Hills", selected: false },
+  { name: "Cedar Ridge Golf Course", city: "Cedar City", selected: false },
+  { name: "Cove View Golf Course", city: "Richfield", selected: false },
+  { name: "Dinaland Golf Course", city: "Vernal", selected: false },
+  { name: "Frank Skul Memorial GC", city: "Tooele", selected: false },
+  { name: "Green River State Park GC", city: "Green River", selected: false },
+  { name: "Millsite Golf Course", city: "Ferron", selected: false },
+  { name: "Moab Golf Club", city: "Moab", selected: false },
+  { name: "Nordic Valley Golf", city: "Eden", selected: false },
+  { name: "Palisade State Park GC", city: "Manti", selected: false },
+  { name: "Remuda Golf Course", city: "Grantsville", selected: false },
+  { name: "Roosevelt Golf Course", city: "Roosevelt", selected: false },
+  { name: "Sun Hills Golf Course", city: "Tooele", selected: false },
+  { name: "Wolf Creek Golf Resort", city: "Eden", selected: false },
+];
+
+// ── API CONFIG ──
+const API_BASE = 'https://golfutah.onrender.com';
+
+// Maps frontend course display name → backend course ID
+const COURSE_ID_MAP = {
+  'Thanksgiving Point Golf Course': 'thanksgiving-point',
+  'The Links at Sleepy Ridge': 'sleepy-ridge',
+  'Bonneville Golf Course': 'bonneville',
+  'Glendale Golf Course': 'glendale',
+  'Forest Dale Golf Course': 'forest-dale',
+  'Mountain Dell Golf Course': 'mountain-dell',
+  'Rose Park Golf Course': 'rose-park',
+  'Old Mill Golf Course': 'old-mill',
+  'Riverbend Golf Course': 'riverbend',
+  'Soldier Hollow Golf Course': 'soldier-hollow',
+  'Sand Hollow Resort': 'sand-hollow-resort',
+  'Sky Mountain Golf Course': 'sky-mountain',
+  'River Oaks Golf Course': 'river-oaks',
+  'Valley View Golf Course': 'valley-view',
+  'Ben Lomond Golf Course': 'ben-lomond',
+  'Eaglewood Golf Course': 'eaglewood',
+  'Bountiful Ridge Golf Course': 'bountiful-ridge',
+};
+
+// ── RENDER COURSE CHIPS ──
+function renderCourses(gridId, filter = '') {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  const q = filter.toLowerCase();
+  const visible = COURSES.filter(c =>
+    !q || c.name.toLowerCase().includes(q) || c.city.toLowerCase().includes(q)
+  );
+  grid.innerHTML = '';
+  visible.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'course-chip' + (c.selected ? ' selected' : '');
+    const highlighted = (txt) => q
+      ? txt.replace(new RegExp(`(${q})`, 'gi'), '<mark style="background:rgba(201,168,76,0.35);border-radius:2px;">$1</mark>')
+      : txt;
+    el.innerHTML = `
+      <div class="chip-check">✓</div>
+      <div class="chip-info">
+        <div class="chip-name">${highlighted(c.name)}</div>
+        <div class="chip-city">${highlighted(c.city)}</div>
+      </div>`;
+    el.onclick = () => {
+      c.selected = !c.selected;
+      el.classList.toggle('selected');
+      updateSelCount();
+    };
+    grid.appendChild(el);
+  });
+  const noMsg = document.getElementById('no-results-msg');
+  if (noMsg) noMsg.style.display = visible.length === 0 ? 'block' : 'none';
+}
+
+function filterCourses(input) {
+  const wrap = document.getElementById('course-search-wrap');
+  wrap.classList.toggle('has-value', input.value.length > 0);
+  renderCourses('courses-grid', input.value);
+}
+
+function clearCourseFilter() {
+  const input = document.getElementById('course-filter');
+  input.value = '';
+  document.getElementById('course-search-wrap').classList.remove('has-value');
+  renderCourses('courses-grid', '');
+  input.focus();
+}
+
+function updateSelCount() {
+  const n = COURSES.filter(c => c.selected).length;
+  document.getElementById('sel-count').textContent = n + ' selected';
+}
+
+// ── TIME WINDOWS ──
+const TIME_WINDOWS = [
+  { label: "Early Bird", range: "5:00 – 7:00 AM", minH: 5, maxH: 7 },
+  { label: "Morning",    range: "7:00 – 9:00 AM", minH: 7, maxH: 9 },
+  { label: "Late Morning", range: "9:00 – 11:00 AM", minH: 9, maxH: 11 },
+  { label: "Midday",    range: "11:00 AM – 1:00 PM", minH: 11, maxH: 13 },
+  { label: "Early Afternoon", range: "1:00 – 3:00 PM", minH: 13, maxH: 15 },
+  { label: "Afternoon", range: "3:00 – 6:00 PM", minH: 15, maxH: 18 },
+];
+
+// ── SEARCH — LIVE API ──
+async function runSearch() {
+  const date = document.getElementById('search-date').value;
+  if (!date) { showToast('Please select a date first'); return; }
+  const selected = COURSES.filter(c => c.selected);
+  if (!selected.length) { showToast('Select at least one course'); return; }
+
+  // Map selected course names to backend IDs (skip ones we don't have IDs for yet)
+  const courseIds = selected
+    .map(c => COURSE_ID_MAP[c.name])
+    .filter(Boolean);
+
+  const area = document.getElementById('results-area');
+  const dateLabel = new Date(date+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  area.innerHTML = `<div class="loading show"><div style="margin-bottom:1rem;font-size:0.9rem;">Searching ${selected.length} course${selected.length !== 1 ? 's' : ''}...</div><div class="dots"><span></span><span></span><span></span></div></div>`;
+
+  let windows = [];
+  let error = null;
+
+  try {
+    const params = new URLSearchParams({ date, players: 2, holes: 18 });
+    if (courseIds.length) params.set('courses', courseIds.join(','));
+    const res = await fetch(`${API_BASE}/api/tee-times?${params}`);
+    if (!res.ok) throw new Error(`API error ${res.status}`);
+    const data = await res.json();
+    windows = data.windows || [];
+  } catch (err) {
+    error = err.message;
+    console.error('API error:', err);
+  }
+
+  if (error) {
+    area.innerHTML = `<div class="empty-state"><div class="e-icon">⚠️</div><h3>Couldn't load times</h3><p>The server may be waking up — try again in 30 seconds.</p><button class="search-btn" style="margin-top:1rem" onclick="runSearch()">Retry →</button></div>`;
+    return;
+  }
+
+  // Count total slots
+  let totalSlots = windows.reduce((sum, w) =>
+    sum + (w.courses || []).reduce((s2, c) => s2 + (c.times || []).length, 0), 0);
+
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+    <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;">Available Times</div>
+    <div style="font-size:0.8rem;color:var(--text-light);">${selected.length} courses · ${dateLabel}</div>
+  </div>`;
+
+  if (windows.length === 0 || totalSlots === 0) {
+    html += `<div class="empty-state"><div class="e-icon">⛳</div><h3>No tee times found</h3><p>These courses may be closed today, or no times are available. Try a different date.</p></div>`;
+  } else {
+    windows.forEach(win => {
+      if (!win.courses || win.courses.length === 0) return;
+      const slotCount = win.courses.reduce((s, c) => s + (c.times || []).length, 0);
+      if (slotCount === 0) return;
+
+      const rows = win.courses.map(course => {
+        if (!course.times || course.times.length === 0) return '';
+        const pills = course.times.map(t => `
+          <a class="tw-time-pill ${t.price ? 'hot' : ''}" href="${course.bookingUrl || '#'}" target="_blank" rel="noopener">
+            <span class="tw-pill-time">${t.time}</span>
+            ${t.price ? `<span class="tw-pill-price">${t.price}</span>` : ''}
+            <span class="tw-pill-book">Book →</span>
+          </a>`).join('');
+        return `<div class="time-window-course-row">
+          <div>
+            <div class="tw-course-name">${course.courseName}</div>
+            <div class="tw-course-city">${course.city || ''}</div>
+          </div>
+          <div class="tw-times-wrap">${pills}</div>
+        </div>`;
+      }).filter(Boolean).join('');
+
+      if (!rows) return;
+
+      html += `<div class="time-window-block">
+        <div class="time-window-header">
+          <span class="time-window-label">${win.label} · ${win.start}:00 – ${win.end}:00</span>
+          <span class="time-window-count">${slotCount} slot${slotCount !== 1 ? 's' : ''} across ${win.courses.filter(c => c.times?.length).length} course${win.courses.filter(c => c.times?.length).length !== 1 ? 's' : ''}</span>
+        </div>
+        ${rows}
+      </div>`;
+    });
+  }
+
+  area.innerHTML = html;
+}
+
+function bookTime(courseName, url) {
+  if (url && url !== '#') {
+    window.open(url, '_blank');
+  } else {
+    showToast(`Opening ${courseName} booking page...`);
+  }
+}
+
+// ── ALERTS ──
+function alertCreated() {
+  showToast('✅ Alert activated! We\'ll text you when a spot opens.');
+  setTimeout(() => showScreen('alerts'), 1500);
+}
+
+// ── SCREENS ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  window.scrollTo(0, 0);
+}
+
+function setTab(el) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── UTILS ──
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+// ── INIT ──
+document.getElementById('search-date').valueAsDate = new Date(Date.now() + 86400000);
+renderCourses('courses-grid', '');
+renderCourses('courses-grid-2', '');
+updateSelCount();
+// Populate alert course dropdown
+const alertSel = document.getElementById('alert-courses');
+if (alertSel) {
+  COURSES.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.name;
+    opt.textContent = `${c.name} — ${c.city}`;
+    alertSel.appendChild(opt);
+  });
+}
+</script>
+</body>
+</html>
