@@ -1,0 +1,26 @@
+{
+  "name": "golf-utah-backend",
+  "version": "1.0.0",
+  "description": "Golf Utah tee time aggregation backend",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "find-ids": "node scripts/find-course-ids.js",
+    "test-api": "node scripts/test-api.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "playwright": "^1.40.0",
+    "node-cron": "^3.0.3",
+    "twilio": "^4.19.0",
+    "dotenv": "^16.3.1",
+    "redis": "^4.6.10",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
