@@ -2,7 +2,7 @@
 // Tests live tee time scraping for all configured courses
 // Run: npm run test-api
 
-const { fetchForeupTimes } = require('../src/scrapers/foreup');
+const { fetchForeUpTimes } = require('../src/scrapers/foreup');
 const { fetchChronogolfTimes } = require('../src/scrapers/chronogolf');
 const { COURSES } = require('../config/courses');
 
@@ -16,7 +16,7 @@ async function testCourse(course) {
   try {
     let times;
     if (course.system === 'foreup') {
-      times = await fetchForeupTimes(course, TEST_DATE, 2, 18);
+      times = await fetchForeUpTimes(course, TEST_DATE, 2, 18);
     } else if (course.system === 'chronogolf') {
       times = await fetchChronogolfTimes(course, TEST_DATE, 2, 18);
     } else {
