@@ -5,7 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "find-ids": "node scripts/find-course-ids.js",
+    "test-api": "node scripts/test-api.js"
   },
   "dependencies": {
     "axios": "^1.6.0",

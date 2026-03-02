@@ -3,7 +3,7 @@
 // normalizes results, and returns them grouped by time window.
 
 const { fetchForeUpTimes } = require('./foreup');
-const { fetchChronogolfTimes, fetchChronogolfWithPlaywright } = require('./chronogolf');
+const { fetchChronogolfTimes } = require('./chronogolf');
 const { COURSES } = require('../../config/courses');
 
 // Time windows for the UI
@@ -61,13 +61,8 @@ async function fetchCourse(course, date, players, holes) {
     case 'foreup':
       return fetchForeUpTimes(course, date, players, holes);
 
-    case 'chronogolf': {
-      // Try direct API first, fall back to Playwright if it fails
-      const direct = await fetchChronogolfTimes(course, date, players, holes);
-      if (direct.length > 0) return direct;
-      // Playwright fallback (slower but more reliable)
-      return fetchChronogolfWithPlaywright(course, date, players, holes);
-    }
+    case 'chronogolf':
+      return fetchChronogolfTimes(course, date, players, holes);
 
     case 'custom':
       // Custom courses don't scrape — they just show a "Book Direct" card
